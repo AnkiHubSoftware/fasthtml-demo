@@ -1,0 +1,65 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# API Reference
+- GET `/v1/datasets`: List datasets
+- GET `/v1/datasets/{id}`: Get dataset by ID
+- GET `/v1/datasets/{id}/versions`: List dataset versions
+- GET `/v1/datasets/{id}/examples`: Get examples from a dataset
+- GET `/v1/datasets/{id}/csv`: Download dataset examples as CSV file
+- GET `/v1/datasets/{id}/jsonl/openai_ft`: Download dataset examples as OpenAI fine-tuning JSONL file
+- GET `/v1/datasets/{id}/jsonl/openai_evals`: Download dataset examples as OpenAI evals JSONL file
+- GET `/v1/datasets/{dataset_id}/experiments`: List experiments by dataset
+- GET `/v1/experiments/{experiment_id}`: Get experiment by ID
+- GET `/v1/experiments/{experiment_id}/json`: Download experiment runs as a JSON file
+- GET `/v1/experiments/{experiment_id}/csv`: Download experiment runs as a CSV file
+- GET `/v1/evaluations`: Get span, trace, or document evaluations from a project
+- GET `/v1/prompts`: Get all prompts
+- GET `/v1/prompts/{prompt_identifier}/versions`: List all prompt versions for a given prompt
+- GET `/v1/prompt_versions/{prompt_version_id}`: Get prompt by prompt version ID
+- GET `/v1/prompts/{prompt_identifier}/tags/{tag_name}`: Get prompt by tag name
+- GET `/v1/prompts/{prompt_identifier}/latest`:Get the latest prompt version
+
+
+# Example Usage
+
+## Helper Function
+```python
+def phoenix_query(endpoint, params=None, method="GET", data=None):
+    "Query the Phoenix API with automatic authentication."
+    headers = {'Authorization': f'Bearer {phoenix_api_key}'}
+    url = f"https://phx.ankihub.net{endpoint}"    
+    match method.upper():
+        case "GET":  response = httpx.get(url,  params=params, headers=headers)
+        case "POST": response = httpx.post(url, params=params, json=data, headers=headers)
+        case _: raise ValueError(f"Unsupported HTTP method: {method}")
+    
+    response.raise_for_status()
+    return response.json()
+```
+
+## Getting examples
+
+```python
+dataset_id = "RGF0YXNldDoxOA==" # Both datasets have same ID
+examples = phoenix_query(f'/v1/datasets/{dataset_id}/examples', params={'limit': 5})
+
+_exp = examples['data']['examples'][0]
+
+# the query the user entered
+_exp['input'] 
+
+# The documents the system returned
+pd.DataFrame(_exp['output']['documents']).head() 
+```
+
+
+
+
+
+
+
+
+
